@@ -1,53 +1,54 @@
+import random
 class TreeNode():
     # It instantiates the class
-    def __init__ (self, val):
-        self.val = val
+    def __init__ (self, data):
+        self.data = data
         self.place = 0
         self.height = 1
         self.leftChild = None
         self.rightChild = None
 
 # Self Balancing Binary Search Tree based on the type of AVL Trees
-class sbbst():
+class TreeClass():
     # It instantiates the class O(1)
-    def __init__(self, valslist = None):
-        self.head = None
+    def __init__(self, dataslist = None):
+        self.root = None
         self.NodeCnt = 0
         self.count = 0
         self.sizes = []
-        self.sumsizes = []
-        self.listInOrder = []
-        if type(valslist) == list:
-            for val in valslist:
-                self.head = self.insertNode(self.head, val)
+        self.allnodes = []
+        self.listnode = []
+        if type(dataslist) == list:
+            for data in dataslist:
+                self.root = self.insertNode(self.root, data)
 
-    # It return True if the val is found, False otherwhise O(logN)
-    def search(self, node, val):
+    # It return True if the data is found, False otherwhise O(logN)
+    def search(self, node, data):
         if not node:
             return False
         else:
-            if node.val < val:
-                return self.search(node.rightChild, val)
-            elif val < node.val:
-                return self.search(node.leftChild, val)
+            if node.data < data:
+                return self.search(node.rightChild, data)
+            elif data < node.data:
+                return self.search(node.leftChild, data)
             else:
                 return True
 
-    # It inserts a node and updates the head node O(logN)
-    def insert(self, val):
-        self.head = self.insertNode(self.head, val)
+    # It inserts a node and updates the root node O(logN)
+    def insert(self, data):
+        self.root = self.insertNode(self.root, data)
     
-    # It inserts a node with a value and returns the node of the modified subtree O(logN)
-    def insertNode(self, node, key):
+    # It inserts a node with a dataue and returns the node of the modified subtree O(logN)
+    def insertNode(self, node, data):
         # Step 1 - Perform normal BST
         if not node:
             self.NodeCnt += 1
-            return TreeNode(key)
+            return TreeNode(data)
         
-        elif key < node.val:
-            node.leftChild = self.insertNode(node.leftChild, key)
+        elif data < node.data:
+            node.leftChild = self.insertNode(node.leftChild, data)
         else:
-            node.rightChild = self.insertNode(node.rightChild, key)
+            node.rightChild = self.insertNode(node.rightChild, data)
         
         # 2: Update the height of the node
         node.height = 1 + max(self.getHeight(node.leftChild), self.getHeight(node.rightChild))
@@ -55,32 +56,32 @@ class sbbst():
         balance = self.getBalance(node)
         # 4: If the node is unbalanced, try out the 2 cases
         if balance > 1: # Case 1: leftChild (leftChild/rightChild)
-            if key > node.leftChild.val:
+            if data > node.leftChild.data:
                 node.leftChild = self.leftChildRotate(node.leftChild)
             return self.rightChildRotate(node)
         if balance < -1: # Case 2: rightChild (leftChild/rightChild)
-            if key < node.rightChild.val:
+            if data < node.rightChild.data:
                 node.rightChild = self.rightChildRotate(node.rightChild)
             return self.leftChildRotate(node)
         # Return the result node
         return node
 
-    # It deletes a node with a certain value and updates the head node O(logN)
-    def delete(self, val):
-        self.head = self.deleteNode(self.head, val)
+    # It deletes a node with a certain dataue and updates the root node O(logN)
+    def delete(self, data):
+        self.root = self.deleteNode(self.root, data)
 
-    # It deletes a node with a certain value and returns the node of the modified subtree O(logN)
-    def deleteNode(self, node, key):
+    # It deletes a node with a certain dataue and returns the node of the modified subtree O(logN)
+    def deleteNode(self, node, data):
         # 1: Standard BST delete
         if not node:
             return node
 
-        elif key < node.val:
-            node.leftChild = self.deleteNode(node.leftChild, key)
-        elif key > node.val:
-            node.rightChild = self.deleteNode(node.rightChild, key)
+        elif data < node.data:
+            node.leftChild = self.deleteNode(node.leftChild, data)
+        elif data > node.data:
+            node.rightChild = self.deleteNode(node.rightChild, data)
 
-        else: # key == node.val            
+        else: # data == node.data            
             if node.leftChild is None:
                 self.NodeCnt -= 1
                 temp = node.rightChild
@@ -92,9 +93,9 @@ class sbbst():
                 node = None
                 return temp
             else: # node.leftChild and node.rightChild
-                temp = self.getMinValueNode(node.rightChild)
-                node.val = temp.val
-                node.rightChild = self.deleteNode(node.rightChild, temp.val)
+                temp = self.getMindataueNode(node.rightChild)
+                node.data = temp.data
+                node.rightChild = self.deleteNode(node.rightChild, temp.data)
 
         # Return None if there is no more nodes
         if node is None:
@@ -154,12 +155,12 @@ class sbbst():
         return self.getHeight(node.leftChild) - self.getHeight(node.rightChild)
 
     # It returns the min Node O(logN)
-    def getMinValueNode(self, node):
+    def getMindataueNode(self, node):
         if node is None or node.leftChild is None:
             return node
-        return self.getMinValueNode(node.leftChild)
+        return self.getMindataueNode(node.leftChild)
 
-    # It returns the min value of the Tree O(logN + K)
+    # It returns the min dataue of the Tree O(logN + K)
     def kthsmallest(self, K):
         if K < 0:
             print('There are not enough elements in the Tree')
@@ -168,7 +169,7 @@ class sbbst():
             return self.kthlargest(self.NodeCnt+1-K)
         else:
             stack = []
-            node = self.head
+            node = self.root
             while(stack or node):
                 if node:
                     stack.append(node)
@@ -176,12 +177,12 @@ class sbbst():
                 else:
                     node = stack.pop()
                     if K == 1:
-                        return node.val
+                        return node.data
                     else:
                         K -= 1
                     node = node.rightChild
     
-    # It returns the max value of the Tree O(losgN + K)
+    # It returns the max dataue of the Tree O(losgN + K)
     def kthlargest(self, K):
         if K < 0:
             print('There are not enough elements in the Tree')
@@ -190,7 +191,7 @@ class sbbst():
             return self.kthsmallest(self.NodeCnt+1-K)
         else:
             stack = []
-            node = self.head
+            node = self.root
             while(stack or node):
                 if node:
                     stack.append(node)
@@ -198,36 +199,36 @@ class sbbst():
                 else:
                     node = stack.pop()
                     if K == 1:
-                        return node.val
+                        return node.data
                     else:
                         K -= 1
                     node = node.leftChild
 
-    # It returns the min value of the Tree O(logN + K)
-    def getMinVal(self, node=-1):
+    # It returns the min dataue of the Tree O(logN + K)
+    def getMindata(self, node=-1):
         if node == -1:
-            if self.head == None:
+            if self.root == None:
                 print('No elements in the Tree')
                 return float('inf')
             else:
-                node = self.head
+                node = self.root
         if node.leftChild:
-            return self.getMinVal(node.leftChild)
+            return self.getMindata(node.leftChild)
         else:
-            return node.val
+            return node.data
 
-    # It returns the max value of the Tree O(logN)
-    def getMaxVal(self, node=-1):
+    # It returns the max dataue of the Tree O(logN)
+    def getMaxdata(self, node=-1):
         if node == -1:
-            if self.head == None:
+            if self.root == None:
                 print('No elements in the Tree')
                 return float('-inf')
             else:
-                node = self.head
+                node = self.root
         if node.rightChild:
-            return self.getMaxVal(node.rightChild)
+            return self.getMaxdata(node.rightChild)
         else:
-            return node.val
+            return node.data
 
     # It returns the number of elements in the Tree O(1)
     def getSize(self):
@@ -235,71 +236,71 @@ class sbbst():
     
     # It returns the height of the Tree O(1)
     def getHeightTree(self):
-        if self.head == None:
+        if self.root == None:
             return 0
-        return self.head.height
+        return self.root.height
 
     # It returns a list in pre Order of the Tree O(N)
     def preOrder(self, node=-1):
         if node == -1:
-            node = self.head
+            node = self.root
         if node:
-            return [node.val] + self.preOrder(node.leftChild) + self.preOrder(node.rightChild)
+            return [node.data] + self.preOrder(node.leftChild) + self.preOrder(node.rightChild)
         else:
             return []
 
     # It returns a list in Order of the Tree O(N)
     def inOrder(self, node=-1):
         if node == -1:
-            node = self.head
+            node = self.root
         if node:
-            return self.inOrder(node.leftChild) + [node.val] + self.inOrder(node.rightChild)
+            return self.inOrder(node.leftChild) + [node.data] + self.inOrder(node.rightChild)
         else:
             return []
 
     # It returns a list in post Order of the Tree O(N)
     def postOrder(self, node=-1):
         if node == -1:
-            node = self.head
+            node = self.root
         if node:
-            return self.postOrder(node.leftChild) + self.postOrder(node.rightChild) + [node.val]
+            return self.postOrder(node.leftChild) + self.postOrder(node.rightChild) + [node.data]
         else:
             return []
 
     # It updates the place of each node and get the list of nodes in Order O(N)
-    def getListInOrder(self, node=-1):
+    def getlistnode(self, node=-1):
         if node == -1:
             self.count = 0
-            node = self.head
-            self.listInOrder = []
+            node = self.root
+            self.listnode = []
         if node:
-            self.getListInOrder(node.leftChild)
-            self.listInOrder.append(node.val)
+            self.getlistnode(node.leftChild)
+            self.listnode.append(node.data)
             node.place = self.count
             self.count += 1
-            self.getListInOrder(node.rightChild)
+            self.getlistnode(node.rightChild)
 
-    # It updates the lists of the size of each value of nodes O(N)
+    # It updates the lists of the size of each dataue of nodes O(N)
     def lenNodes(self):
         self.sizes = []
-        self.sumsizes = []
-        for x in self.listInOrder:
+        self.allnodes = []
+        for x in self.listnode:
             self.sizes.append(len(str(x)))
         past = 1
         for x in self.sizes:
-            self.sumsizes.append(past)
+            self.allnodes.append(past)
             past += x
-        self.sumsizes.append(past)
+        self.allnodes.append(past)
 
     # It returns the full draw of the tree in 2dimensions O(N)
     def __str__(self):
-        self.getListInOrder()
+        self.getlistnode()
         self.lenNodes()
-        if self.head == None:
+        if self.root == None:
             return 'No elements in the Tree'
 
         outstr = '\n'
-        queue = [self.head]
+        queue = [self.root]
         while queue:
             aux = []
             past, nextpast = 0, 0
@@ -308,55 +309,55 @@ class sbbst():
                 if q.leftChild and q.rightChild:
                     aux.append(q.leftChild)
                     aux.append(q.rightChild)
-                    # Print of the _ and the values of the nodes
-                    line += ' '*(self.sumsizes[q.leftChild.place+1]-past) + '_'*(self.sumsizes[q.place]-self.sumsizes[q.leftChild.place+1]) + str(q.val) + '_'*(self.sumsizes[q.rightChild.place]-self.sumsizes[q.place+1])
-                    past = self.sumsizes[q.rightChild.place]
+                    # Print of the _ and the dataues of the nodes
+                    line += ' '*(self.allnodes[q.leftChild.place+1]-past) + '_'*(self.allnodes[q.place]-self.allnodes[q.leftChild.place+1]) + str(q.data) + '_'*(self.allnodes[q.rightChild.place]-self.allnodes[q.place+1])
+                    past = self.allnodes[q.rightChild.place]
                     # Print of the arms of the Tree
-                    nextline += ' '*(self.sumsizes[q.leftChild.place+1]-nextpast-1) + '/' + ' '*(self.sumsizes[q.rightChild.place]-self.sumsizes[q.leftChild.place+1]) + '\\' + ' '*(self.sizes[q.rightChild.place]-1)
-                    nextpast = self.sumsizes[q.rightChild.place+1]
+                    nextline += ' '*(self.allnodes[q.leftChild.place+1]-nextpast-1) + '/' + ' '*(self.allnodes[q.rightChild.place]-self.allnodes[q.leftChild.place+1]) + '\\' + ' '*(self.sizes[q.rightChild.place]-1)
+                    nextpast = self.allnodes[q.rightChild.place+1]
                 elif q.leftChild:
                     aux.append(q.leftChild)
-                    # Print of the _ and the values of the nodes
-                    line += ' '*(self.sumsizes[q.leftChild.place+1]-past) + '_'*(self.sumsizes[q.place]-self.sumsizes[q.leftChild.place+1]) + str(q.val)
-                    past = self.sumsizes[q.place+1]
+                    # Print of the _ and the dataues of the nodes
+                    line += ' '*(self.allnodes[q.leftChild.place+1]-past) + '_'*(self.allnodes[q.place]-self.allnodes[q.leftChild.place+1]) + str(q.data)
+                    past = self.allnodes[q.place+1]
                     # Print of the arms of the Tree
-                    nextline += ' '*(self.sumsizes[q.leftChild.place+1]-nextpast-1) + '/'
-                    nextpast = self.sumsizes[q.leftChild.place+1]
+                    nextline += ' '*(self.allnodes[q.leftChild.place+1]-nextpast-1) + '/'
+                    nextpast = self.allnodes[q.leftChild.place+1]
                 elif q.rightChild:
                     aux.append(q.rightChild)
-                    # Print of the _ and the values of the nodes
-                    line += ' '*(self.sumsizes[q.place]-past)+str(q.val)+'_'*(self.sumsizes[q.rightChild.place]-self.sumsizes[q.place+1])
-                    past = self.sumsizes[q.rightChild.place]
+                    # Print of the _ and the dataues of the nodes
+                    line += ' '*(self.allnodes[q.place]-past)+str(q.data)+'_'*(self.allnodes[q.rightChild.place]-self.allnodes[q.place+1])
+                    past = self.allnodes[q.rightChild.place]
                     # Print of the arms of the Tree
-                    nextline += ' '*(self.sumsizes[q.rightChild.place]-nextpast) + '\\' + ' '*(self.sizes[q.rightChild.place]-1)
-                    nextpast = self.sumsizes[q.rightChild.place+1]
+                    nextline += ' '*(self.allnodes[q.rightChild.place]-nextpast) + '\\' + ' '*(self.sizes[q.rightChild.place]-1)
+                    nextpast = self.allnodes[q.rightChild.place+1]
                 else:
-                    line += ' '*(self.sumsizes[q.place]-past)+str(q.val)
-                    past = self.sumsizes[q.place+1]
+                    line += ' '*(self.allnodes[q.place]-past)+str(q.data)
+                    past = self.allnodes[q.place+1]
             # Add the lines to the output string
             outstr += line + '\n' + nextline + '\n'
             queue = aux
         return outstr[:-1]
 
-# It returns the head of the Tree that was build with the plane Tree "s"
+# It returns the root of the Tree that was build with the plane Tree "s"
 def getTree(s):
     if type(s) == str:
         if ',' in s:
-            key = ','
+            data = ','
             s.replace(' ','')
         else:
-            key = ' ' 
-        aux = s.split(key)
-        key = 'null' if 'null' in aux else ('None' if 'None' in aux else '-1')
-        mylist = [None if x == key else int(x) for x in aux]
+            data = ' ' 
+        aux = s.split(data)
+        data = 'null' if 'null' in aux else ('None' if 'None' in aux else '-1')
+        mylist = [None if x == data else int(x) for x in aux]
     elif type(s) == list and 0 < len(s) and type(s[0]) == int:
         mylist = s if None in s else [None if x == -1 else int(x) for x in s]
     else:
         print('Wrong format for the input')
         return None
     # Stars building the tree
-    head = TreeNode(mylist[0])
-    queue = [head]
+    root = TreeNode(mylist[0])
+    queue = [root]
     i = 1
     while queue:
         aux = []
@@ -370,15 +371,15 @@ def getTree(s):
                 aux.append(q.rightChild)
             i += 1
         queue = aux
-    return head
+    return root
 
 # It returns the full draw of the tree in 2dimensions O(N)
-def getStr(head):
-    if head == None:
+def getStr(root):
+    if root == None:
         return 'No elements in the Tree'
-    # Gets the in-order list of the values and its place
-    listInOrder, stack = [], []
-    node = head
+    # Gets the in-order list of the dataues and its place
+    listnode, stack = [], []
+    node = root
     count = 0
     while(stack or node):
         if node:
@@ -386,22 +387,22 @@ def getStr(head):
             node = node.leftChild
         else:
             node = stack.pop()
-            listInOrder.append(node.val)
+            listnode.append(node.data)
             node.place = count
             count += 1
             node = node.rightChild
     # Gets the sizes of each node
-    sizes, sumsizes = [], []
-    for x in listInOrder:
+    sizes, allnodes = [], []
+    for x in listnode:
         sizes.append(len(str(x)))
     past = 1
     for x in sizes:
-        sumsizes.append(past)
+        allnodes.append(past)
         past += x
-    sumsizes.append(past)
+    allnodes.append(past)
     # Builds the output string
     outstr = '\n'
-    queue = [head]
+    queue = [root]
     while queue:
         aux = []
         past, nextpast = 0, 0
@@ -410,31 +411,31 @@ def getStr(head):
             if q.leftChild and q.rightChild:
                 aux.append(q.leftChild)
                 aux.append(q.rightChild)
-                # Print of the _ and the values of the nodes
-                line += ' '*(sumsizes[q.leftChild.place+1]-past) + '_'*(sumsizes[q.place]-sumsizes[q.leftChild.place+1]) + str(q.val) + '_'*(sumsizes[q.rightChild.place]-sumsizes[q.place+1])
-                past = sumsizes[q.rightChild.place]
+                # Print of the _ and the dataues of the nodes
+                line += ' '*(allnodes[q.leftChild.place+1]-past) + '_'*(allnodes[q.place]-allnodes[q.leftChild.place+1]) + str(q.data) + '_'*(allnodes[q.rightChild.place]-allnodes[q.place+1])
+                past = allnodes[q.rightChild.place]
                 # Print of the arms of the Tree
-                nextline += ' '*(sumsizes[q.leftChild.place+1]-nextpast-1) + '/' + ' '*(sumsizes[q.rightChild.place]-sumsizes[q.leftChild.place+1]) + '\\' + ' '*(sizes[q.rightChild.place]-1)
-                nextpast = sumsizes[q.rightChild.place+1]
+                nextline += ' '*(allnodes[q.leftChild.place+1]-nextpast-1) + '/' + ' '*(allnodes[q.rightChild.place]-allnodes[q.leftChild.place+1]) + '\\' + ' '*(sizes[q.rightChild.place]-1)
+                nextpast = allnodes[q.rightChild.place+1]
             elif q.leftChild:
                 aux.append(q.leftChild)
-                # Print of the _ and the values of the nodes
-                line += ' '*(sumsizes[q.leftChild.place+1]-past) + '_'*(sumsizes[q.place]-sumsizes[q.leftChild.place+1]) + str(q.val)
-                past = sumsizes[q.place+1]
+                # Print of the _ and the dataues of the nodes
+                line += ' '*(allnodes[q.leftChild.place+1]-past) + '_'*(allnodes[q.place]-allnodes[q.leftChild.place+1]) + str(q.data)
+                past = allnodes[q.place+1]
                 # Print of the arms of the Tree
-                nextline += ' '*(sumsizes[q.leftChild.place+1]-nextpast-1) + '/'
-                nextpast = sumsizes[q.leftChild.place+1]
+                nextline += ' '*(allnodes[q.leftChild.place+1]-nextpast-1) + '/'
+                nextpast = allnodes[q.leftChild.place+1]
             elif q.rightChild:
                 aux.append(q.rightChild)
-                # Print of the _ and the values of the nodes
-                line += ' '*(sumsizes[q.place]-past)+str(q.val)+'_'*(sumsizes[q.rightChild.place]-sumsizes[q.place+1])
-                past = sumsizes[q.rightChild.place]
+                # Print of the _ and the dataues of the nodes
+                line += ' '*(allnodes[q.place]-past)+str(q.data)+'_'*(allnodes[q.rightChild.place]-allnodes[q.place+1])
+                past = allnodes[q.rightChild.place]
                 # Print of the arms of the Tree
-                nextline += ' '*(sumsizes[q.rightChild.place]-nextpast) + '\\' + ' '*(sizes[q.rightChild.place]-1)
-                nextpast = sumsizes[q.rightChild.place+1]
+                nextline += ' '*(allnodes[q.rightChild.place]-nextpast) + '\\' + ' '*(sizes[q.rightChild.place]-1)
+                nextpast = allnodes[q.rightChild.place+1]
             else:
-                line += ' '*(sumsizes[q.place]-past)+str(q.val)
-                past = sumsizes[q.place+1]
+                line += ' '*(allnodes[q.place]-past)+str(q.data)
+                past = allnodes[q.place+1]
         # Add the lines to the output string
         outstr += line + '\n' + nextline + '\n'
         queue = aux
@@ -447,14 +448,17 @@ def getList(Node):
     while stack:
         q = stack.pop()
         if q:
-            treeList.append(q.val)
+            treeList.append(q.data)
             stack.append(q.rightChild)
             stack.append(q.leftChild)
         else:
             treeList.append(None)
     return treeList
-root = sbbst()
-nums = [128, 131, 4, 134, 135, 10, 1, 3, 140, 14, 142, 145, 146, 147, 149] # random numbers
+root = TreeClass()
+nums = []
+for i in range(0,40):
+    element = random.randint(1,300)
+    nums.append(element)
 for num in nums:
     root.insert(num)
 root.insert(27)
@@ -463,12 +467,64 @@ root.insert(35)
 root.insert(31)
 root.insert(10)
 root.insert(19)
-# searching the values
-valueToSearch = TreeNode(7)
-print(root.search(valueToSearch, 7))
-valueToSearch = TreeNode(14)
-print(root.search(valueToSearch, 14))
+# searching the dataues
+dataueToSearch = TreeNode(7)
+print(root.search(dataueToSearch, 7))
+dataueToSearch = TreeNode(14)
+print(root.search(dataueToSearch, 14))
 print(root)
 root.delete(14)
 print(root)
 # python ./Binary_Tree.py - to run this program
+# OUTPUT: 
+#True
+#True
+#
+#          __________128_________
+#         /                      \
+#    ____14____               ___140___
+#   /          \             /         \
+#  _4        __27__        134         145___
+# /  \      /      \      /   \       /      \
+# 1  10    14      35   131   135   142      147
+#  \   \     \    /                         /   \
+#  3   10    19  31                       146   149
+#
+#
+#          ________128_________
+#         /                    \
+#    ____14__               ___140___
+#   /        \             /         \
+#  _4        27__        134         145___
+# /  \      /    \      /   \       /      \
+# 1  10    19    35   131   135   142      147
+#  \   \        /                         /   \
+#  3   10      31                       146   149
+#
+#True
+#True
+#
+#                        ________________89_________________________________________
+#                       /                                                           \
+#              ________35______                                _____________________176_________
+#             /                \                              /                                 \
+#      ______18____          __43____              _________130_________                     ___207_________
+#     /            \        /        \            /                     \                   /               \
+#  __11__          31      42      __51         109___               ___154___            185            ___267
+# /      \        /  \    /  \    /    \       /      \             /         \          /   \          /      \
+# 2      14      27  33  35  43  49    80    100      126         148         155      180   190      244      276
+#  \    /  \    /                  \        /        /   \       /   \       /   \                   /   \        \
+#  10  14  15  19                  50      90      123   128   142   152   154   163               234   256      300
+#
+#
+#                      ________________89_________________________________________
+#                     /                                                           \
+#            ________35______                                _____________________176_________
+#           /                \                              /                                 \
+#      ____18____          __43____              _________130_________                     ___207_________
+#     /          \        /        \            /                     \                   /               \
+#  __11__        31      42      __51         109___               ___154___            185            ___267
+# /      \      /  \    /  \    /    \       /      \             /         \          /   \          /      \
+# 2      15    27  33  35  43  49    80    100      126         148         155      180   190      244      276
+#  \    /     /                  \        /        /   \       /   \       /   \                   /   \        \
+#  10  14    19                  50      90      123   128   142   152   154   163               234   256      300
